@@ -9,6 +9,7 @@
 
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/linux-event-codes.h>
+#include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
 #include <dt-bindings/regulator/qcom,rpmh-regulator.h>
 #include <dt-bindings/arm/qcom,ids.h>
@@ -525,8 +526,36 @@
 			   <GCC_CPUSS_GNOC_CLK>;
 };
 
+&qupv3_id_0 {
+	status = "okay";
+};
+
 &qupv3_id_1 {
 	status = "okay";
+};
+
+&i2c5 {
+	clock-frequency = <400000>;
+
+	status = "okay";
+
+	touchscreen@49 {
+		compatible = "st,stmfts5";
+		reg = <0x49>;
+
+		interrupts-extended = <&tlmm 125 IRQ_TYPE_LEVEL_LOW>;
+
+		reset-gpios = <&tlmm 126 GPIO_ACTIVE_LOW>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&ts_int_default &ts_reset_default>;
+
+		avdd-supply = <&vreg_l28a_3p0>;
+		vdd-supply = <&vreg_l14a_1p88>;
+
+		touchscreen-size-x = <1080>;
+		touchscreen-size-y = <2160>;
+	};
 };
 
 &tlmm {
@@ -702,6 +731,20 @@
 		bias-pull-down;
 	};
 
+	ts_int_default: ts-int-default-state {
+		pins = "gpio125";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-pull-up;
+	};
+
+	ts_reset_default: ts-reset-default-state {
+		pins = "gpio126";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-disable;
+	};
+
 	sdc2_clk: sdc2-clk-state {
 		pins = "sdc2_clk";
 		bias-disable;
@@ -746,7 +789,6 @@
 &ibb { status = "disabled"; };
 &lab { status = "disabled"; };
 
-&qupv3_id_0 { status = "disabled"; };
 &i2c8 { status = "disabled"; };
 &i2c9 { status = "disabled"; };
 &i2c10 { status = "disabled"; };
