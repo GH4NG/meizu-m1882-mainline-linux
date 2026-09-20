@@ -157,12 +157,13 @@
 		};
 	};
 
-	battery: battery {
+		battery: battery {
 		compatible = "simple-battery";
 
-		charge-full-design-microamp-hours = <3200000>;
-		voltage-min-design-microvolt = <3700000>;
+		charge-full-design-microamp-hours = <3010000>;
+		voltage-min-design-microvolt = <3300000>;
 		voltage-max-design-microvolt = <4400000>;
+		constant-charge-current-max-microamp = <2950000>;
 	};
 
 	vph_pwr: vph-pwr-regulator {
@@ -770,8 +771,19 @@
 &mdss_dsi1 { status = "disabled"; };
 &mdss_dsi1_phy { status = "disabled"; };
 &mss_pil { status = "disabled"; };
-&pmi8998_charger { status = "disabled"; };
-&pmi8998_fg { status = "disabled"; };
+&pmi8998_charger {
+	monitored-battery = <&battery>;
+
+	status = "okay";
+};
+
+&pmi8998_fg {
+	monitored-battery = <&battery>;
+	power-supplies = <&pmi8998_charger>;
+
+	status = "okay";
+};
+
 &pmi8998_haptics { status = "disabled"; };
 &pmi8998_wled { status = "disabled"; };
 &sdhc_2 { status = "disabled"; };
