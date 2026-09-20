@@ -1028,6 +1028,19 @@ config DRM_PANEL_SAMSUNG_SOFEF00
 
 	    Samsung AMS628NW01 (found in OnePlus 6, 1080x2280@60Hz)
 
+config DRM_PANEL_SAMSUNG_SOFEF00M
+	tristate "Samsung SOFEF00M DSI panel controller"
+	depends on OF
+	depends on DRM_MIPI_DSI
+	depends on BACKLIGHT_CLASS_DEVICE
+	select VIDEOMODE_HELPERS
+	help
+	  Say Y or M here if you want to enable support for the Samsung AMOLED
+	  panel SOFEF00M DDIC and connected panel.
+	  Currently supported panels:
+
+	    Samsung AMS601NT22 (found in Meizu 16th, 1080x2160@60Hz)
+
 config DRM_PANEL_SEIKO_43WVF1G
 	tristate "Seiko 43WVF1G panel"
 	depends on OF

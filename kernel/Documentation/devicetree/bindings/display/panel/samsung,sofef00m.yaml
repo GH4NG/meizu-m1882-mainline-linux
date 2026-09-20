@@ -1,0 +1,72 @@
+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/display/panel/samsung,sofef00m.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Samsung SOFEF00M AMOLED DDIC
+
+description: |
+  The SOFEF00M is a display driver IC with connected panel, driven in MIPI
+  DSI command mode.  Power rails (vddio 1.8V / vdd 3.0V), reset timing and
+  command sequence follow the Meizu 16th (M1882) stock device tree.
+
+maintainers:
+  - David Heidelberg <david@ixit.cz>
+
+allOf:
+  - $ref: panel-common.yaml#
+
+properties:
+  compatible:
+    const: samsung,sofef00m
+
+  reg:
+    maxItems: 1
+
+  reset-gpios:
+    description: Panel reset GPIO (active low)
+
+  vdd-supply:
+    description: VDD (3.0 V) regulator
+
+  vddio-supply:
+    description: VDDIO (1.8 V) regulator
+
+  port: true
+
+required:
+  - compatible
+  - reg
+  - reset-gpios
+  - vdd-supply
+  - vddio-supply
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/gpio/gpio.h>
+
+    dsi {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        panel@0 {
+            compatible = "samsung,sofef00m";
+            reg = <0>;
+
+            vddio-supply = <&vreg_l14a_1p88>;
+            vdd-supply = <&lcd_vdd>;
+
+            reset-gpios = <&pm8998_gpios 8 GPIO_ACTIVE_LOW>;
+
+            port {
+                panel_in: endpoint {
+                    remote-endpoint = <&mdss_dsi0_out>;
+                };
+            };
+        };
+    };
+
+...

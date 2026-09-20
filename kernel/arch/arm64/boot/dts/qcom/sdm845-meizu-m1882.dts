@@ -643,6 +643,45 @@
 	status = "disabled";
 };
 
+&mdss {
+	status = "okay";
+};
+
+&mdss_dsi0 {
+	status = "okay";
+	vdda-supply = <&vdda_mipi_dsi0_1p2>;
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&sde_te>;
+	pinctrl-1 = <&sde_te>;
+
+	panel: panel@0 {
+		compatible = "samsung,sofef00m";
+		reg = <0>;
+
+		vddio-supply = <&disp_vddio_vreg>;
+		vdd-supply = <&disp_vci_vreg>;
+
+		reset-gpios = <&pm8998_gpios 8 GPIO_ACTIVE_LOW>;
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&mdss_dsi0_out>;
+			};
+		};
+	};
+};
+
+&mdss_dsi0_out {
+	remote-endpoint = <&panel_in>;
+	data-lanes = <0 1 2 3>;
+};
+
+&mdss_dsi0_phy {
+	status = "okay";
+	vdds-supply = <&vdda_mipi_dsi0_pll>;
+};
+
 &qup_uart9_rx {
 	drive-strength = <2>;
 	bias-pull-up;
@@ -654,7 +693,14 @@
 };
 
 &tlmm {
-	gpio-reserved-ranges = <80 5>, <87 20>;
+	gpio-reserved-ranges = <80 5>, <87 12>, <100 7>;
+
+	sde_te: sde-te-state {
+		pins = "gpio10";
+		function = "mdp_vsync";
+		drive-strength = <2>;
+		bias-pull-down;
+	};
 
 	sdc2_clk: sdc2-clk-state {
 		pins = "sdc2_clk";
@@ -677,10 +723,7 @@
 
 &cdsp_pas { status = "disabled"; };
 &gpu { status = "disabled"; };
-&mdss { status = "disabled"; };
 &mdss_dp { status = "disabled"; };
-&mdss_dsi0 { status = "disabled"; };
-&mdss_dsi0_phy { status = "disabled"; };
 &mdss_dsi1 { status = "disabled"; };
 &mdss_dsi1_phy { status = "disabled"; };
 &mss_pil { status = "disabled"; };
