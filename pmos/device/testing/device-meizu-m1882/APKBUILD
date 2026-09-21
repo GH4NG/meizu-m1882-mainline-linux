@@ -1,0 +1,35 @@
+# Reference: <https://postmarketos.org/devicepkg>
+maintainer="GH4NG <gh4ng@users.noreply.github.com>"
+pkgname=device-meizu-m1882
+pkgdesc="Meizu 16th"
+pkgver=1
+pkgrel=0
+url="https://postmarketos.org"
+license="MIT"
+arch="aarch64"
+options="!archcheck !check !strip"
+depends="
+	android-tools-mkbootimg
+	firmware-meizu-m1882
+	linux-meizu-m1882
+	postmarketos-base
+	"
+makedepends="devicepkg-dev"
+source="
+	deviceinfo
+	modules-initfs
+	"
+
+
+build() {
+	devicepkg_build $startdir $pkgname
+}
+
+package() {
+	devicepkg_package $startdir $pkgname
+}
+
+sha512sums="
+91fac7e0b0be81861c2eba249c5bab97aa0ef272f28fad8bf1e6bf9bbb96a85e2591c2963cce4b15ce6d8c36f94bf211c5879ed92037a0b463876cf7e5bb52ad  deviceinfo
+c7763f6f17f78f0ed3a19104a0f4ad99a9bfa99741b0ff39bae97c776fe4e827c20687f2291e1cbae9c274d3db89e79511df94131739a512dc771272813a4097  modules-initfs
+"

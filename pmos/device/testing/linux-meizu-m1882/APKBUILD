@@ -1,0 +1,95 @@
+maintainer="GH4NG <gh4ng@users.noreply.github.com>"
+_flavor="meizu-m1882"
+pkgname=linux-$_flavor
+pkgver=7.1_rc1
+pkgrel=0
+pkgdesc="Mainline kernel for Meizu 16th (SDM845)"
+arch="aarch64"
+_carch="arm64"
+url="https://github.com/GH4NG/meizu-m1882-mainline-linux"
+license="GPL-2.0-only"
+options="
+	!check
+	!strip
+	!tracedeps
+	pmb:cross-native
+"
+makedepends="
+	bison
+	clang
+	elfutils-dev
+	findutils
+	flex
+	linux-headers
+	lld
+	llvm
+	openssl-dev
+	pahole
+	perl
+	postmarketos-installkernel
+	python3
+	zstd
+"
+
+_repo="meizu-m1882-mainline-linux"
+
+# 日常构建（pmbootstrap build --envkernel）不使用这个值：
+# 它直接打包本地 kernel/.output，source 不下载、校验和跳过。
+# 只有正规构建（不带 --envkernel，会下载这个 archive 从零编译）才读它，
+# 所以在发布/给别人用之前更新一次即可：
+#   sed -i "s|^_commit=.*|_commit=$(git -C kernel rev-parse HEAD)|" \
+#       pmos/device/testing/linux-meizu-m1882/APKBUILD
+_commit="42d4dbbc0a33ab1ec94b786d437eca637909e158"
+
+source="
+	$_repo-$_commit.tar.gz::https://github.com/GH4NG/$_repo/archive/$_commit.tar.gz
+"
+builddir="$srcdir/$_repo-$_commit/kernel"
+
+prepare() {
+	# 配置取自仓库根的 config/（单一来源；包里不放副本，免得两份漂移）
+	cp "$srcdir/$_repo-$_commit/config/sdm845-meizu-m1882.config" .config
+}
+
+build() {
+	unset LDFLAGS
+	make ARCH="$_carch" LLVM=1 \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-$_flavor"
+}
+
+package() {
+	if [ -e "$builddir/arch/$_carch/boot/vmlinuz.efi" ]; then
+		# ZBOOT EFI decompressor for EFI booting
+		install -Dm644 "$builddir/arch/$_carch/boot/vmlinuz.efi" \
+			"$pkgdir/boot/linux.efi"
+
+		# Old GZIP'd kernel image for boot.img compatibility
+		install -Dm644 "$builddir/arch/$_carch/boot/vmlinuz" \
+			"$pkgdir/boot/vmlinuz"
+	else
+		echo "WARNING: CONFIG_ZBOOT not enabled!"
+		install -Dm644 "$builddir/arch/$_carch/boot/Image.gz" \
+			"$pkgdir/boot/vmlinuz"
+	fi
+
+	make modules_install dtbs_install \
+		ARCH="$_carch" \
+		LLVM=1 \
+		INSTALL_PATH="$pkgdir"/boot/ \
+		INSTALL_MOD_PATH="$pkgdir"/usr/ \
+		INSTALL_MOD_STRIP=1 \
+		INSTALL_DTBS_PATH="$pkgdir"/boot/dtbs-tmp
+
+	mkdir -p "$pkgdir"/boot/dtbs/qcom
+	cp -r "$pkgdir"/boot/dtbs-tmp/qcom/sdm8* "$pkgdir"/boot/dtbs/qcom
+	rm -rf "$pkgdir"/boot/dtbs-tmp
+
+	rm -f "$pkgdir"/usr/lib/modules/*/build "$pkgdir"/usr/lib/modules/*/source
+
+	install -D "$builddir"/include/config/kernel.release \
+		"$pkgdir"/usr/share/kernel/$_flavor/kernel.release
+}
+
+sha512sums="
+SKIP
+"

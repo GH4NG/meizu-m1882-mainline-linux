@@ -1,0 +1,22 @@
+maintainer="GH4NG <gh4ng@users.noreply.github.com>"
+pkgname=firmware-meizu-m1882
+pkgver=1
+pkgrel=0
+pkgdesc="Firmware for Meizu 16th"
+url="https://github.com/GH4NG/meizu-m1882-mainline-linux"
+arch="aarch64"
+depends="linux-firmware-qcom"
+license="MIT"
+source="
+	firmware-initramfs.files
+	"
+options="!archcheck !check !strip !tracedeps"
+
+package() {
+	install -Dm644 "$srcdir"/firmware-initramfs.files \
+		"$pkgdir"/usr/share/mkinitfs/files/"$pkgname".files
+}
+
+sha512sums="
+eddf8cc724d321534070fe5c7db613b9f64d3cbdb63043383d6fc3c21d7d16c09a3f76bc81b94a648160de9097c85ccbbc4ad7aa6fe6cb996980509bc2455e71  firmware-initramfs.files
+"
