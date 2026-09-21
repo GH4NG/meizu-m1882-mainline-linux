@@ -512,6 +512,14 @@
 	};
 };
 
+/ {
+	ufs_vcc_dummy: regulator-ufs-vcc-dummy {
+		compatible = "regulator-fixed";
+		regulator-name = "ufs_vcc_dummy";
+		regulator-always-on;
+	};
+};
+
 &gcc {
 	protected-clocks = <GCC_QSPI_CORE_CLK>,
 			   <GCC_QSPI_CORE_CLK_SRC>,
@@ -628,6 +636,13 @@
 
 	vcc-supply = <&vreg_l20a_2p95>;
 	vcc-max-microamp = <600000>;
+	
+	vccq2-supply = <&vreg_s4a_1p8>;
+	vccq2-max-microamp = <600000>;
+
+	vccq-supply = <&ufs_vcc_dummy>;
+	vccq-max-microamp = <600000>;
+	vdd-hba-supply = <&ufs_vcc_dummy>;
 };
 
 &ufs_mem_phy {
@@ -766,7 +781,15 @@
 };
 
 &cdsp_pas { status = "disabled"; };
-&gpu { status = "disabled"; };
+
+&gpu {
+	status = "okay";
+};
+
+&gpu_zap_shader {
+	firmware-name = "qcom/sdm845/a630_zap.mbn";
+};
+
 &mdss_dp { status = "disabled"; };
 &mdss_dsi1 { status = "disabled"; };
 &mdss_dsi1_phy { status = "disabled"; };
@@ -790,6 +813,10 @@
 &slim { status = "disabled"; };
 &sound { status = "disabled"; };
 &usb_2 { status = "disabled"; };
+
+&{/soc@0/etr@6048000} {
+	status = "disabled";
+};
 
 &camss { status = "disabled"; };
 &adsp_pas { status = "disabled"; };
