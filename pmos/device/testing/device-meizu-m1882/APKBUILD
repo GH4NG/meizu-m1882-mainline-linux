@@ -11,8 +11,11 @@ options="!archcheck !check !strip"
 depends="
 	android-tools-mkbootimg
 	firmware-meizu-m1882
+	linux-firmware-ath10k
 	linux-meizu-m1882
 	postmarketos-base
+	rmtfs
+	tqftpserv
 	"
 makedepends="devicepkg-dev"
 source="

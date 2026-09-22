@@ -1,0 +1,8 @@
+[Unit]
+Description=Meizu M1882 stock modem firmware
+
+[Mount]
+What=/dev/disk/by-partlabel/modem
+Where=/usr/lib/firmware/qcom/sdm845/Meizu/m1882
+Type=vfat
+Options=ro,nosuid,nodev,noexec
